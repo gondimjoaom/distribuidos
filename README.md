@@ -17,3 +17,4 @@
 * https://docs.python.org/3/library/xmlrpc.client.html#module-xmlrpc.client talvez possa ajudar a usar RPC
 * https://docs.python.org/3/library/xmlrpc.server.html#module-xmlrpc.server lado server
 * https://stackoverflow.com/questions/3310049/proper-use-of-mutexes-in-python
+* https://stackoverflow.com/questions/31508574/semaphores-on-python esse link pode ser bastante útil!!
