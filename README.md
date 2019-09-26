@@ -1,4 +1,4 @@
-# Trabalho de Distribuídos
+# trabalho de Distribuídos
 
 #### Fazer:
 - [ ] Juntar classes classeBanco e classeCliente em um arquivo que vai rodar o programa;
@@ -18,3 +18,4 @@
 * https://docs.python.org/3/library/xmlrpc.server.html#module-xmlrpc.server lado server
 * https://stackoverflow.com/questions/3310049/proper-use-of-mutexes-in-python
 * https://stackoverflow.com/questions/31508574/semaphores-on-python esse link pode ser bastante útil!!
+* https://www.pubnub.com/blog/socket-programming-in-python-client-server-p2p/
