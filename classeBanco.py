@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from classeCliente import Client
 import socket
 
@@ -9,6 +12,13 @@ def deposito(nome, doc, valor):
     for cliente in clientes:
         if (cliente.nome == nome and cliente.doc == doc):
             cliente.saldo += valor
+def saque(nome, doc, valor):
+    for cliente in clientes:
+        if (cliente.nome == nome and cliente.doc == doc):
+            if(cliente.saldo < valor):
+                return 'error'
+            cliente.saldo -= valor
+            return 'success'
 
 def sendString(msg):
     return conn.send(msg.encode())
@@ -40,6 +50,13 @@ while True:
         valor = conn.recv(4096).decode()
         deposito(clienteNome, clienteDoc, int(valor))
         conn.send(verSaldo(clienteNome, clienteDoc))
+    elif data == 'saque':
+        valor = conn.recv(4096).decode()
+        result = saque(clienteNome, clienteDoc, int(valor))
+        if(result == 'success'):
+            conn.send(verSaldo(clienteNome, clienteDoc))
+        else:
+            conn.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
     elif not data:
         break
 

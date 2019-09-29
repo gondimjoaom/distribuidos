@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 class Client (object):
     def __init__(self, nome, doc, saldo = 0):
         self.nome = nome
