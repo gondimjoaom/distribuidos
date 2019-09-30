@@ -6,11 +6,13 @@ class Client (threading.Thread):
         self.clienteAddress = caddres
         self.nome = self.clientSocket.recv(4096).decode()
         self.doc = self.clientSocket.recv(4096).decode()
-        self.saldo = saldo
+        with open('data.json') as f:
+            data = json.load(f)
+        self.saldo = data[self.nome][0]
         
 
     def run(self):
-        print('Cliente {} conectado através do IP {}.'.format(self.nome, self.clienteAddress[0]))
+        print('Cliente {} de documento {} conectado através do IP {}.'.format(self.nome, self.doc, self.clienteAddress[0]))
         while True:
             msg = self.clientSocket.recv(4096).decode()
             if msg == 'xau' or not msg:
@@ -54,7 +56,12 @@ class Client (threading.Thread):
         
     def deposito(self, valor):
         self.saldo += int(valor)
-            
+        with open('data.json') as f:
+            data = json.load(f)
+            data[self.nome][0] = self.saldo
+        with open('data.json', 'w') as out:
+            json.dump(data, out)
+
     def saque(self, valor):
         if(self.saldo < valor):
             return 'error'
