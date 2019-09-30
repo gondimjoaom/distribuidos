@@ -2,7 +2,7 @@ import socket
 import time
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('127.0.0.7', 8000))
+client.connect(('127.0.0.1', 8000))
 
 nome = input('Seja bem vindo ao Banco Gringotes, para comerçamos digite o seu nome de usuário: ')
 client.send(nome.encode())
