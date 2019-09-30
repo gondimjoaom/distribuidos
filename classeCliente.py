@@ -1,4 +1,4 @@
-import socket, threading
+import socket, threading, json
 class Client (threading.Thread):
     def __init__(self, csocket, caddres, saldo = 0):
         threading.Thread.__init__(self)
