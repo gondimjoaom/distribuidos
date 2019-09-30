@@ -32,7 +32,12 @@ class Client (threading.Thread):
                 result = self.saque(int(valor))
                 if(result == 'success'):
                     self.clientSocket.send('Saque realizado com sucesso. {}'.format(self.verSaldo()).encode())
-                    print('Valor de {} para saque na conta de {}.'.format(valor, self.nome))                    
+                    print('Valor de {} para saque na conta de {}.'.format(valor, self.nome))
+                    with open('data.json') as f:
+                        data = json.load(f)
+                        data[self.nome][0] = self.saldo
+                    with open('data.json', 'w') as out:
+                        json.dump(data, out)           
                 else:
                     self.clientSocket.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
                     print('Error - Valor de {} para deposito na conta de {}.'.format(valor, self.nome))
