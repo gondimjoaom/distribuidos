@@ -12,7 +12,9 @@ print("Banco Gringotes iniciado e escutando na porta 8000")
 
 
 while True:
-    server.listen(1)
-    conn, add = server.accept()
-    newCliente = Client(conn, add)
-    newCliente.start()
+    with open('data.json') as f:
+        print(json.load(f))
+        server.listen(1)
+        conn, add = server.accept()
+        newCliente = Client(conn, add)
+        newCliente.start()
