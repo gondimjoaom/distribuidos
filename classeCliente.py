@@ -32,7 +32,7 @@ class Client (threading.Thread):
                 valor = self.clientSocket.recv(4096).decode()
                 result = self.saque(int(valor))
                 if(result == 'success'):
-                    self.clientSocket.send(self.verSaldo().encode())
+                    self.clientSocket.send('Saque realizado com sucesso. {}'.format(self.verSaldo()).encode())
                     print('Valor de {} para saque na conta de {}.'.format(valor, self.nome))                    
                 else:
                     self.clientSocket.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
