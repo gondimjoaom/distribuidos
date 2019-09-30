@@ -35,6 +35,14 @@ while a != 'Encerrar':
         print(client.recv(4096).decode())                             
         pass
     if a == '4':
+        client.send('transferencia'.encode())  
+        nome_destinatario = input("\nQual o nome do destinatário? \n")
+        client.send(nome_destinatario.encode())            
+        doc_destinatario = input("\nQual o documento do destinatário? \n") 
+        client.send(doc_destinatario.encode())         
+        valor = input("\nQual o valor da tranferência? \n")
+        client.send(valor.encode())
+        print(client.recv(4096).decode())                                 
         pass
 
     a = input('\nQual outra operação você deseja realizar?: \n \

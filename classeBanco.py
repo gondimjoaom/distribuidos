@@ -19,15 +19,25 @@ def saque(nome, doc, valor):
                 return 'error'
             cliente.saldo -= valor
             return 'success'
+def transferencia(nome, doc, valor, nome_destinatario, doc_destinatario):
+    result = saque(nome, doc, int(valor))
+    if(result == 'success'):
+        deposito(nome_destinatario, doc_destinatario, int(valor))
+        return 'success' 
+    else:
+        return 'error'
+            
 
 def sendString(msg):
     return conn.send(msg.encode())
 
 cliente1 = Client('Joao', '123', 500)
+cliente2 = Client('Paula', '321', 1000)
 
 clientes = []
 
 clientes.append(cliente1)
+clientes.append(cliente2)
 
 #estabelecendo conexão
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,6 +67,15 @@ while True:
             conn.send(verSaldo(clienteNome, clienteDoc))
         else:
             conn.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
+    elif data == 'transferencia':
+        nome_destinatario = conn.recv(4096).decode()
+        doc_destinatario = conn.recv(4096).decode()
+        valor = conn.recv(4096).decode() 
+        result = transferencia(clienteNome, clienteDoc, int(valor), nome_destinatario, doc_destinatario)
+        if(result == 'success'):
+            conn.send(str("Transferência realizada com sucesso").encode())
+        else:
+            conn.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())          
     elif not data:
         break
 
