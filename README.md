@@ -52,15 +52,15 @@ python appCliente.py
 
 ```
 
-Seja bem vindo ao Banco Gringotes, para comerçamos digite o seu nome de usuário: #Joao
-Ótimo! Agora digite o seu documento: *123*
+Seja bem vindo ao Banco Gringotes, para comerçamos digite o seu nome de usuário: <b>Joao</b>
+Ótimo! Agora digite o seu documento: <b>123<b/>
 Qual operação você deseja realizar?:
              Digite 1 para Saldo
              Digite 2 para Depósito
              Digite 3 para Saque
              Digite 4 para transferência entre contas
              Digite "Encerrar" para fechar o sistema!
-*1*
+<b>1</b>
 
 Seu saldo é de R$1806.
 
