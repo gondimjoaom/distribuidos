@@ -1,5 +1,9 @@
 # Trabalho de Sistemas Distribuídos
 
+### Alunos
+
+João Gondim, Paula Tavares e Joaldino Calixto.
+
 ### Descrição
 
 Esquema de comunicação ara simular um sistema bancário de transações liente-servidor 
@@ -48,15 +52,15 @@ python appCliente.py
 
 ```
 
-Seja bem vindo ao Banco Gringotes, para comerçamos digite o seu nome de usuário: ** Joao **
-Ótimo! Agora digite o seu documento: ** 123 **
+Seja bem vindo ao Banco Gringotes, para comerçamos digite o seu nome de usuário: **Joao**
+Ótimo! Agora digite o seu documento: **123**
 Qual operação você deseja realizar?:
              Digite 1 para Saldo
              Digite 2 para Depósito
              Digite 3 para Saque
              Digite 4 para transferência entre contas
              Digite "Encerrar" para fechar o sistema!
-** 1 **
+**1**
 
 Seu saldo é de R$1806.
 
