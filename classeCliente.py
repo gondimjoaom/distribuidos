@@ -18,17 +18,22 @@ class Client (threading.Thread):
         print('Cliente {} de documento {} conectado através do IP {}.'.format(self.nome, self.doc, self.clienteAddress[0]))
         while True:
             msg = self.clientSocket.recv(4096).decode()
-            if msg == 'xau' or not msg:
+            #
+            # Casos de interação do usuário disponíveis
+            #
+            if not msg:
                 break
             elif msg == 'saldo':
                 print('Cliente {} solicitou visualizar o seu saldo.'.format(self.nome))
                 self.clientSocket.send(self.verSaldo().encode())
+                
             elif msg == 'deposito':
                 print('Cliente {} deseja fazer um deposito. Aguardando o valor'. format(self.nome))
                 valor = self.clientSocket.recv(4096).decode()
                 self.deposito(int(valor))
                 print('Valor de {} para deposito na conta de {}.'.format(valor, self.nome))
                 self.clientSocket.send(self.verSaldo().encode())
+                
             elif msg == 'saque':
                 print('Cliente {} deseja fazer um saque. Aguardando o valor'. format(self.nome))                
                 valor = self.clientSocket.recv(4096).decode()
@@ -39,6 +44,7 @@ class Client (threading.Thread):
                 else:
                     self.clientSocket.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
                     print('Error - Valor de {} para deposito na conta de {}.'.format(valor, self.nome))
+                    
             elif msg == 'transferencia':
                 nome_destinatario = self.clientSocket.recv(4096).decode()
                 doc_destinatario = self.clientSocket.recv(4096).decode()
@@ -49,26 +55,42 @@ class Client (threading.Thread):
                 else:
                     self.clientSocket.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
                 print(msg)
+                
             else:
                 print(msg)
         print('{} desconectou.'.format(self.nome)) 
     
+    # Função
+    # Verifica o saldo do usuário logado
+    #
     def verSaldo(self):
+        self.atualiza_saldo()
         saldo = "\nSeu saldo é de R$" + str(self.saldo) + "."
         return saldo
-        
+    
+    # Função
+    # Faz depósito na conta do usuário logado
+    #
     def deposito(self, valor):
         self.saldo += int(valor)
         self.altera_saldo(self.nome, self.saldo)
-
+    
+    # Função
+    # Realiza saque na conta do usuário logado
+    #
     def saque(self, valor):
+        self.atualiza_saldo()        
         if(self.saldo < valor):
             return 'error'
         self.saldo -= valor
         self.altera_saldo(self.nome, self.saldo)        
         return 'success'
-                
+    
+    # Função
+    # Realiza transferência da conta logada para outrem
+    #     
     def transferencia(self, valor, nome_destinatario):
+        self.atualiza_saldo()        
         result = self.saque(valor)
         nome = nome_destinatario
         if(result == 'success'):
@@ -80,13 +102,20 @@ class Client (threading.Thread):
         else:
             return 'error'
     
+    # Função
+    # Altera o saldo de conta passada por parâmetro
+    # 
     def altera_saldo(self, nome, saldo):
+        self.atualiza_saldo()        
         with open('data.json') as f:
             data = json.load(f)
             data[nome][0] = saldo
         with open('data.json', 'w') as out:
             json.dump(data, out)  
     
+    # Função
+    # Atuliza o saldo antes de operações
+    # 
     def atualiza_saldo(self):
         with open('data.json') as f:
             data = json.load(f)
