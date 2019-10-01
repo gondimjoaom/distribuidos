@@ -18,7 +18,7 @@ class Client (threading.Thread):
         print('Cliente {} de documento {} conectado através do IP {}.'.format(self.nome, self.doc, self.clienteAddress[0]))
         while True:
             msg = self.clientSocket.recv(4096).decode()
-            switch(msg) == 'xau' or not msg:
+            if msg == 'xau' or not msg:
                 break
             elif msg == 'saldo':
                 print('Cliente {} solicitou visualizar o seu saldo.'.format(self.nome))
