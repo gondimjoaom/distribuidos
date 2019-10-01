@@ -10,8 +10,8 @@ Python3
 
 ### Solução:
 
-O sistema do banco é caracterizado pelo arquivo (appBanco.py)[appBanco.py] que realiza as configurações necessárias para conexão do socket e a viabilização do de multi-threadings. No mesmo é realizado o import da classe associada ao cliente contendo toda a estrutura de informação do cliente e as funções que realizam as operações disponíveis.
-O arquivo (appClient.py)[appClient.py] corresponde ao aplicativo do cliente no qual o mesmo poderá fazer o input de seus dados e interagir de forma a escolher as ações a serem realizadas.
+O sistema do banco é caracterizado pelo arquivo [appBanco.py](appBanco.py) que realiza as configurações necessárias para conexão do socket e a viabilização do de multi-threadings. No mesmo é realizado o import da classe associada ao cliente contendo toda a estrutura de informação do cliente e as funções que realizam as operações disponíveis.
+O arquivo [appClient.py](appClient.py) corresponde ao aplicativo do cliente no qual o mesmo poderá fazer o input de seus dados e interagir de forma a escolher as ações a serem realizadas.
 Tanto o servidor do banco como o aplicativo do cliente mantém a conexão através de socket comunicando-se a partir da utilização de comandos de 'send' e 'receive'.
 Todos os dados dos clientes são salvos em arquivo.
 
@@ -30,21 +30,18 @@ Todos os dados dos clientes são salvos em arquivo.
 ```
 virtualenv -p python3 banco_socket
 source banco_socket/bin/activate
-
 ```
 
 2 - Executar o arquivo `appBanco.py` para iniciar o servidor do banco:
 
 ```
 python appBanco.py
-
 ```
 
 3 - Executar o arquivo `appCliente.pyy` para executar a aplicação do cliente:
 
 ```
 python appCliente.py
-
 ```
 
 4 - Depois é só seguir o passo a passo. Entradas de exemplo:
