@@ -52,7 +52,7 @@ python appCliente.py
 
 ```
 
-Seja bem vindo ao Banco Gringotes, para comerçamos digite o seu nome de usuário: *Joao*
+Seja bem vindo ao Banco Gringotes, para comerçamos digite o seu nome de usuário: #Joao
 Ótimo! Agora digite o seu documento: *123*
 Qual operação você deseja realizar?:
              Digite 1 para Saldo
