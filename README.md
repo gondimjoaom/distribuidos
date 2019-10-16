@@ -6,7 +6,7 @@ João Gondim, Paula Tavares e Joaldino Calixto.
 
 ### Descrição
 
-Esquema de comunicação ara simular um sistema bancário de transações liente-servidor 
+Esquema de comunicação ara simular um sistema bancário de transações cliente-servidor 
 
 ### Linguagem escolhida:
 
