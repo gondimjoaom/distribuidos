@@ -1,9 +1,31 @@
 import socket, threading, json
+from time import gmtime, strftime
+from random import random
+
+def print_snapshot(state):
+    print('SNAPSHOT!!!\nClients: {} \nEvents: {} \nSnapshotToken: {}'.format(
+        state["clients"],
+        state["events"],
+        state["snapshot_token"]
+    ))
+
 #
 # Classe com a lógica referente as interações do cliente
 #
 class Client (threading.Thread):
-    def __init__(self, csocket, caddres, saldo = 0):
+    def to_string(self):
+        self.atualiza_saldo()
+        return "Client {} - saldo {}".format(self.nome, self.saldo)
+        
+    def __str__(self):
+        return self.to_string()
+    def __unicode__(self):
+        return self.to_string()
+    def __repr__(self):
+        return self.to_string()
+
+        
+    def __init__(self, csocket, caddres, localState, saldo = 0):
         threading.Thread.__init__(self)
         self.clientSocket = csocket
         self.clienteAddress = caddres
@@ -12,20 +34,29 @@ class Client (threading.Thread):
         with open('data.json') as f:
             data = json.load(f)
         self.saldo = data[self.nome][0]
+        self.localState = localState
         
 
     def run(self):
         print('Cliente {} de documento {} conectado através do IP {}.'.format(self.nome, self.doc, self.clienteAddress[0]))
         while True:
+            snapshot_token = self.clientSocket.recv(4096).decode()
             msg = self.clientSocket.recv(4096).decode()
+            content = msg
             #
             # Casos de interação do usuário disponíveis
             #
             if not msg:
                 break
+            elif msg == 'snapshot':
+                self.localState["snapshot_token"] = str(random())
+                print_snapshot(self.localState)
+                self.clientSocket.send(self.localState["snapshot_token"].encode())
+                
             elif msg == 'saldo':
                 print('Cliente {} solicitou visualizar o seu saldo.'.format(self.nome))
                 self.clientSocket.send(self.verSaldo().encode())
+                content = '{} - {}'.format(msg, self.verSaldo())
                 
             elif msg == 'deposito':
                 print('Cliente {} deseja fazer um deposito. Aguardando o valor'. format(self.nome))
@@ -33,11 +64,13 @@ class Client (threading.Thread):
                 self.deposito(int(valor))
                 print('Valor de {} para deposito na conta de {}.'.format(valor, self.nome))
                 self.clientSocket.send(self.verSaldo().encode())
+                content = '{} - {}'.format(msg, valor)
                 
             elif msg == 'saque':
                 print('Cliente {} deseja fazer um saque. Aguardando o valor'. format(self.nome))                
                 valor = self.clientSocket.recv(4096).decode()
                 result = self.saque(int(valor))
+                content = '{} - {} - {}'.format(msg, valor, result)
                 if(result == 'success'):
                     self.clientSocket.send('Saque realizado com sucesso. {}'.format(self.verSaldo()).encode())
                     print('Valor de {} para saque na conta de {}.'.format(valor, self.nome))
@@ -50,6 +83,7 @@ class Client (threading.Thread):
                 doc_destinatario = self.clientSocket.recv(4096).decode()
                 valor = self.clientSocket.recv(4096).decode() 
                 result = self.transferencia(int(valor), nome_destinatario)
+                content = '{} - {} - {}'.format(msg, valor, result)
                 if(result == 'success'):
                     self.clientSocket.send(str("Transferência realizada com sucesso").encode())
                 else:
@@ -58,6 +92,13 @@ class Client (threading.Thread):
                 
             else:
                 print(msg)
+            
+            # self.clientSocket.send(self.localState["snapshot_token"].encode())
+            self.localState["events"].append({ 
+                "message": content, 
+                "client" : self.nome, 
+                "time": strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())  
+            })
         print('{} desconectou.'.format(self.nome)) 
     
     # Função

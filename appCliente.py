@@ -18,6 +18,8 @@ client.send(nome.encode())
 doc = input('Ótimo! Agora digite o seu documento: ')
 client.send(doc.encode())
 
+snapshot_token = "-"
+
 #
 # Opções de interação com o servidor
 #
@@ -28,6 +30,7 @@ a = input('Qual operação você deseja realizar?: \n \
             Digite 4 para transferência entre contas\n \
             Digite \"Encerrar\" para fechar o sistema!\n')
 while a != 'Encerrar':
+    client.send(snapshot_token.encode())
     if a == '1':
         client.send('saldo'.encode())
         print(client.recv(4096).decode())
@@ -35,7 +38,8 @@ while a != 'Encerrar':
         client.send('deposito'.encode())
         valor = input("\nQual o valor do depósito? \n")
         client.send(valor.encode())
-        print('Depósito feito com sucesso. %s' %client.recv(4096).decode())
+        response = client.recv(4096).decode()
+        print('Depósito feito com sucesso. %s' % response)
         pass
     if a == '3':
         client.send('saque'.encode())  
@@ -51,8 +55,15 @@ while a != 'Encerrar':
         client.send(doc_destinatario.encode())         
         valor = input("\nQual o valor da tranferência? \n")
         client.send(valor.encode())
-        print(client.recv(4096).decode())                                 
+        print(client.recv(4096).decode())
         pass
+    if a == 'snapshot':
+        client.send('snapshot'.encode())
+        client.recv(4096)
+        pass
+        
+        
+    #print(client.recv(4096))
 
     a = input('\nQual outra operação você deseja realizar?: \n \
             Digite 1 para Saldo\n \

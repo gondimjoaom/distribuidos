@@ -8,9 +8,15 @@ import socket, threading, json
 # Estabelecendo conexão
 #
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('127.0.0.1', 8000))
+server.bind(('', 8000))
 
 print("Banco Gringotes iniciado e escutando na porta 8000")
+
+localState = {
+    "events": [],
+    "clients": [],
+    "snapshot_token": "-"
+}
 
 #
 # Manter o server ativo através de threading
@@ -18,5 +24,6 @@ print("Banco Gringotes iniciado e escutando na porta 8000")
 while True:
     server.listen(1)
     conn, add = server.accept()
-    newCliente = Client(conn, add)
+    newCliente = Client(conn, add, localState)
+    localState["clients"].append(newCliente)
     newCliente.start()
