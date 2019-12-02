@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import threading
 import socket
 import time
 
@@ -18,7 +19,40 @@ client.send(nome.encode())
 doc = input('Ótimo! Agora digite o seu documento: ')
 client.send(doc.encode())
 
-snapshot_token = "-"
+localState = {
+    "snapshot_token": '-'
+}
+
+def message_handler():
+    while True:
+        msg = client.recv(4096)
+        if not msg:
+            pass
+        msg = msg.decode()
+        
+        if msg == 'snapshot-token-updated':
+            localState["snapshot_token"] = client.recv(4096).decode()
+            print("Novo token de snapshot é {}".format(localState["snapshot_token"]))
+            pass
+        elif msg == 'saldo-resposta':
+            print(client.recv(4096).decode())
+            pass
+        elif msg == 'deposito-resposta':
+            response = client.recv(4096).decode()
+            print('Depósito feito com sucesso. %s' % response)
+            pass
+        elif msg == 'saque-resposta':
+            print(client.recv(4096).decode())                             
+            pass
+        elif msg == 'transferencia-resposta':
+            print(client.recv(4096).decode())
+            pass
+        elif msg == 'novo-snapshot':
+            print(client.recv(4096).decode())
+            pass
+
+thread = threading.Thread(target = message_handler)
+thread.start()
 
 #
 # Opções de interação com o servidor
@@ -30,24 +64,21 @@ a = input('Qual operação você deseja realizar?: \n \
             Digite 4 para transferência entre contas\n \
             Digite \"Encerrar\" para fechar o sistema!\n')
 while a != 'Encerrar':
-    client.send(snapshot_token.encode())
+    client.send(localState["snapshot_token"].encode())
+    time.sleep(1)
     if a == '1':
         client.send('saldo'.encode())
-        print(client.recv(4096).decode())
-    if a == '2':
+    elif a == '2':
         client.send('deposito'.encode())
         valor = input("\nQual o valor do depósito? \n")
         client.send(valor.encode())
-        response = client.recv(4096).decode()
-        print('Depósito feito com sucesso. %s' % response)
         pass
-    if a == '3':
+    elif a == '3':
         client.send('saque'.encode())  
         valor = input("\nQual o valor do saque? \n")
-        client.send(valor.encode()) 
-        print(client.recv(4096).decode())                             
+        client.send(valor.encode())                          
         pass
-    if a == '4':
+    elif a == '4':
         client.send('transferencia'.encode())  
         nome_destinatario = input("\nQual o nome do destinatário? \n")
         client.send(nome_destinatario.encode())            
@@ -55,15 +86,12 @@ while a != 'Encerrar':
         client.send(doc_destinatario.encode())         
         valor = input("\nQual o valor da tranferência? \n")
         client.send(valor.encode())
-        print(client.recv(4096).decode())
         pass
-    if a == 'snapshot':
+    elif a == 'snapshot':
         client.send('snapshot'.encode())
-        client.recv(4096)
         pass
-        
-        
-    #print(client.recv(4096))
+    else:
+        client.send('comando-desconhecido'.encode())
 
     a = input('\nQual outra operação você deseja realizar?: \n \
             Digite 1 para Saldo\n \

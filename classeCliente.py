@@ -1,5 +1,5 @@
 import socket, threading, json
-from time import gmtime, strftime
+from time import gmtime, strftime, sleep
 from random import random
 
 def print_snapshot(state):
@@ -36,6 +36,11 @@ class Client (threading.Thread):
         self.saldo = data[self.nome][0]
         self.localState = localState
         
+    def send(self, type, msg):
+        self.clientSocket.sendall(type.encode())
+        sleep(0.5)
+        self.clientSocket.sendall(msg.encode())
+        sleep(0.5)
 
     def run(self):
         print('Cliente {} de documento {} conectado através do IP {}.'.format(self.nome, self.doc, self.clienteAddress[0]))
@@ -43,19 +48,25 @@ class Client (threading.Thread):
             snapshot_token = self.clientSocket.recv(4096).decode()
             msg = self.clientSocket.recv(4096).decode()
             content = msg
+            
             #
             # Casos de interação do usuário disponíveis
             #
             if not msg:
                 break
             elif msg == 'snapshot':
-                self.localState["snapshot_token"] = str(random())
+                self.localState["snapshot_token"] = str(random()) + "\r\n"
                 print_snapshot(self.localState)
-                self.clientSocket.send(self.localState["snapshot_token"].encode())
+                for client in self.localState["clients"]:
+                    try:
+                        client.send("snapshot-token-updated", self.localState["snapshot_token"])
+                    except Error as ex:
+                        print(ex)
+                        pass
                 
             elif msg == 'saldo':
                 print('Cliente {} solicitou visualizar o seu saldo.'.format(self.nome))
-                self.clientSocket.send(self.verSaldo().encode())
+                self.send("saldo-resposta", self.verSaldo())
                 content = '{} - {}'.format(msg, self.verSaldo())
                 
             elif msg == 'deposito':
@@ -63,7 +74,7 @@ class Client (threading.Thread):
                 valor = self.clientSocket.recv(4096).decode()
                 self.deposito(int(valor))
                 print('Valor de {} para deposito na conta de {}.'.format(valor, self.nome))
-                self.clientSocket.send(self.verSaldo().encode())
+                self.send("deposito-resposta", self.verSaldo())
                 content = '{} - {}'.format(msg, valor)
                 
             elif msg == 'saque':
@@ -72,10 +83,16 @@ class Client (threading.Thread):
                 result = self.saque(int(valor))
                 content = '{} - {} - {}'.format(msg, valor, result)
                 if(result == 'success'):
-                    self.clientSocket.send('Saque realizado com sucesso. {}'.format(self.verSaldo()).encode())
+                    self.send(
+                        "saque-resposta", 
+                        'Saque realizado com sucesso. {}'.format(self.verSaldo())
+                    )
                     print('Valor de {} para saque na conta de {}.'.format(valor, self.nome))
                 else:
-                    self.clientSocket.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
+                    self.send(
+                        "saque-resposta", 
+                        str("Não é possível realizar essa operação: saldo insuficiente")
+                    )
                     print('Error - Valor de {} para deposito na conta de {}.'.format(valor, self.nome))
                     
             elif msg == 'transferencia':
@@ -85,13 +102,26 @@ class Client (threading.Thread):
                 result = self.transferencia(int(valor), nome_destinatario)
                 content = '{} - {} - {}'.format(msg, valor, result)
                 if(result == 'success'):
-                    self.clientSocket.send(str("Transferência realizada com sucesso").encode())
+                    self.send(
+                        "transferencia-resposta", 
+                        str("Transferência realizada com sucesso")
+                    )
                 else:
-                    self.clientSocket.send(str("Não é possível realizar essa operação: saldo insuficiente").encode())
+                    self.send(
+                        "transferencia-resposta", 
+                        str("Não é possível realizar essa operação: saldo insuficiente")
+                    )
                 print(msg)
                 
             else:
                 print(msg)
+            
+            if msg != 'snapshot' and self.localState["snapshot_token"] != snapshot_token:
+                print("WRONG {}".format(snapshot_token))
+                self.send('snapshot-token-updated', self.localState["snapshot_token"])
+                print("Menagem recebida com snapshot-token antigo, regerando snapshot...")
+                print_snapshot(self.localState)
+                
             
             # self.clientSocket.send(self.localState["snapshot_token"].encode())
             self.localState["events"].append({ 
